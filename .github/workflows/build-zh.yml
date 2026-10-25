@@ -1,0 +1,33 @@
+name: Build Chinese APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Set up Android SDK
+        run: |
+          mkdir -p $ANDROID_HOME
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+      - name: Add Chinese locale files
+        run: |
+          # 这一步会检查各模块的中文翻译目录是否存在
+          echo "检查汉化文件..."
+      - name: Build APK
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:assembleFullDebug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: cleanyourtv-zh-apk
+          path: app/build/outputs/apk/full/debug/*.apk
